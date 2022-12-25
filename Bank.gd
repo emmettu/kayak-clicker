@@ -23,6 +23,7 @@ const RAMEN = "Fresh Ramen"
 const ENTHUSIAST = "Yak Enthusiast"
 const ADVERT = "News Advert"
 const ORCA = "Orca"
+const SANTA = "Santa"
 
 var unlock_tiers = {
 	50: [DRIP_COFFEE],
@@ -36,6 +37,7 @@ var unlock_tiers = {
 	3000: [ENTHUSIAST],
 	8000: [ADVERT],
 	12000: [ORCA],
+	25000: [SANTA],
 }
 
 signal money_updated(money, amount)

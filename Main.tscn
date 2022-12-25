@@ -147,11 +147,11 @@ margin_bottom = 71.0
 custom_fonts/font = ExtResource( 7 )
 text = "Sorry we're closed. WE'RE CLOS-
 
-Wait a minute, you're the new owner aren't you? Geez, why'd a kiddo like you go and buy a place like this? We've got about $10 in the bank and I think pretty much all the kayaks are broken except one. 
+Wait a minute... you're the new owner aren't you? Geez, why'd a kiddo like you go and buy a place like this? We've got about $10 in the bank and I think pretty much all the kayaks are broken, except one. 
 
-Ugh, I'm being pessimistic. Who knows, maybe you can turn this place around.
+Ugh, my wife says I'm too pessimistic. Who knows? Maybe you can turn this place around.
 
-The first thing you gotta know about running a kayak outlet is the TWO Ks. KAYAKS, and KUSTOMERS. Remember that, and you're all set. Anyway... good luck I guess."
+The first thing you gotta know about running a kayak outlet is the TWO Ks. KAYAKS, and KUSTOMERS. Remember that, and you're all set. Anyway... good luck, I'm sure you'll need it."
 autowrap = true
 
 [node name="Button" type="Button" parent="Title/Panel2"]

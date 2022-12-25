@@ -41,6 +41,7 @@ const RAMEN = "Fresh Ramen"
 const ENTHUSIAST = "Yak Enthusiast"
 const ADVERT = "News Advert"
 const ORCA = "Orca"
+const SANTA = "Santa"
 
 var items = {}
 var timers = {}
@@ -64,11 +65,12 @@ var ramen_texture = load("res://icons/ramen.svg")
 var enthusiast_texture = load("res://icons/enthusiast.svg")
 var news_advert_texture = load("res://icons/news_advert.svg")
 var orca_texture = load("res://icons/orca.svg")
+var santa_texture = load("res://icons/santa.svg")
 
 var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER]
 # var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER, DRIP_COFFEE, SPEEDY_KAYAK, COFFEE_GIRL, CHEF, RAMEN, ENTHUSIAST, ADVERT, ORCA, BARISTA, ESPRESSO]
 
-const CUSTOMER_PRIORITY = [ENTHUSIAST, HOBBYIST_GUEST, ORDINARY_CUSTOMER]
+const CUSTOMER_PRIORITY = [SANTA, ENTHUSIAST, HOBBYIST_GUEST, ORDINARY_CUSTOMER]
 
 const TREAT_PRIORITY = [RAMEN, ESPRESSO, FRENCH_PRESS, BREAKY_BURRITO, DRIP_COFFEE]
 
@@ -93,20 +95,20 @@ var customer_retention = {
 	ORDINARY_CUSTOMER: 0.25,
 	HOBBYIST_GUEST: 0.75,
 	ENTHUSIAST: 1,
+	SANTA: 1,
 }
 
 var item_money = {
 	CHEAPO_KAYAK: 1,
-	WOODEN_PADDLE: 1,
-	DIRTBAG_GUIDE: 4,
 	DRIP_COFFEE: 2,
 	BREAKY_BURRITO: 5,
-	ORDINARY_CUSTOMER: 5,
+	ORDINARY_CUSTOMER: 4,
 	FRENCH_PRESS: 9,
 	ESPRESSO: 14,
 	RAMEN: 20,
 	HOBBYIST_GUEST: 10,
 	ENTHUSIAST: 15,
+	SANTA: 500,
 }
 
 var item_textures = {
@@ -128,6 +130,7 @@ var item_textures = {
 	ENTHUSIAST: enthusiast_texture,
 	ADVERT: news_advert_texture,
 	ORCA: orca_texture,
+	SANTA: santa_texture,
 }
 
 var item_costs = {
@@ -147,6 +150,7 @@ var item_costs = {
 	ENTHUSIAST: 120,
 	ADVERT: 300,
 	ORCA: 1000,
+	SANTA: 10000,
 }
 
 var item_descriptions = {
@@ -165,7 +169,8 @@ var item_descriptions = {
 	CHEF: "Cost: $150\nNow normally I would only work for the finest restaurants, but I must admit I'm impressed by your little kayak outlet. For $5 every 14 seconds I'll serve your guests fresh ramen.",
 	ENTHUSIAST: "Cost: $120\nI've paddled around the globe 3 times. Also, in case you haven't noticed I'm a literal captain. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
 	ADVERT: "Cost: $300\nOh wow, you're advertising now? This is serious, I hope you're ready for all this fame. Every 20 seconds you'll get a new random customer.",
-	ORCA: "Cost: $1000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
+	ORCA: "Cost: $1,000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
+	SANTA: "Cost: $10,000\nHo Ho Ho! Merry Christmas, and congratulations on such a flouring kayak business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
 }
 
 var rng = RandomNumberGenerator.new()
@@ -207,7 +212,6 @@ func _on_ItemList_item_selected(index):
 	
 func _on_Item_triggered(name):
 	# var amount = item_money[name] * items[name]
-	var cindex = 0; var kindex = 0
 	
 	if name.ends_with("Kayak"):
 		var customers_served = {}
@@ -313,6 +317,6 @@ func _on_BuyButton_pressed():
 		emit_signal("attempted_purchase", current_item, item_costs[current_item])
 
 
-func _on_Bank_items_unlocked(items):
-	for i in items:
+func _on_Bank_items_unlocked(new_items):
+	for i in new_items:
 		emit_signal("item_available", i)
