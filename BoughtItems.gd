@@ -18,13 +18,13 @@ func _ready():
 #	pass
 
 
-func _on_Shop_new_item_bought(item, texture):
+func _on_Shop_new_item_bought(item, texture, count=1):
 	var panel = item_panel.instance()
 	panel.name = item
 	add_child(panel)
 	panel.set_name(item)
 	panel.set_icon(texture)
-	panel.set_count(1)
+	panel.set_count(count)
 	shop.connect("item_triggered", panel, "_on_Shop_item_triggered")
 	
 

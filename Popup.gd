@@ -31,9 +31,10 @@ func get_font_color():
 func _on_Timer_timeout():
 	hide()
 
-func _on_Bank_items_unlocked(items):
-	popup_centered_minsize()
-	$Timer.start()
+func _on_Bank_items_unlocked(items, notify):
+	if notify:
+		popup_centered_minsize()
+		$Timer.start()
 
 
 func _on_Bank_not_enough_money():

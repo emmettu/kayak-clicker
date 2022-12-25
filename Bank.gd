@@ -25,12 +25,16 @@ const ADVERT = "News Advert"
 const ORCA = "Orca"
 const SANTA = "Santa"
 
+var max_unlock = 0
 var unlock_tiers = {
 	50: [DRIP_COFFEE],
 	100: [BREAKY_BURRITO],
-	200: [FRENCH_PRESS, COOKING_DUDE],
-	400: [HOBBYIST_GUEST, ESPRESSO],
-	600: [COFFEE_GIRL, RAMEN],
+	200: [FRENCH_PRESS],
+	300: [COOKING_DUDE],
+	400: [HOBBYIST_GUEST],
+	500: [ESPRESSO],
+	600: [COFFEE_GIRL],
+	800: [RAMEN],
 	1000: [BARISTA],
 	1200: [SPEEDY_KAYAK],
 	1500: [CHEF],
@@ -46,10 +50,19 @@ signal not_enough_money
 
 signal item_bought(item)
 
-signal items_unlocked(items)
+signal items_unlocked(items, notify)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	var save_file = File.new()
+
+	if save_file.file_exists("user://save.json"):
+		save_file.open("user://save.json", File.READ)
+		var save_data = parse_json(save_file.get_as_text())
+		save_file.close()
+		money = save_data["money"]
+		max_unlock = save_data["unlock_tier"]
+		unlock_up_to(max_unlock, false)
 	emit_signal("money_updated", money, money)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -58,12 +71,20 @@ func _ready():
 
 func _on_Shop_money_earned(amount):
 	money += amount
-	for tier in unlock_tiers:
-		if money >= tier:
-			emit_signal("items_unlocked", unlock_tiers[tier])
-			unlock_tiers.erase(tier)
+	unlock_up_to(money)
 	emit_signal("money_updated", money, amount)
 
+
+func unlock_up_to(amount, notify=true):
+	var completed_tiers = []
+	for tier in unlock_tiers:
+		if amount >= tier:
+			max_unlock = max(max_unlock, tier)
+			emit_signal("items_unlocked", unlock_tiers[tier], notify)
+			completed_tiers.append(tier)
+			
+	for tier in completed_tiers:
+		unlock_tiers.erase(tier)
 
 func _on_Shop_attempted_purchase(item, cost):
 	if cost > money and cost != 0:

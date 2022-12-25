@@ -7,7 +7,7 @@ extends Node
 
 signal item_available(item)
 
-signal new_item_bought(item, texture)
+signal new_item_bought(item, texture, amount)
 
 signal item_bought(item, count)
 
@@ -24,8 +24,6 @@ var item_timer = preload("res://Item.tscn")
 onready var item_list = get_node("%ItemList")
 
 const CHEAPO_KAYAK = "Cheapo Kayak"
-const WOODEN_PADDLE = "Wooden Paddle"
-const DIRTBAG_GUIDE = "Dirtbag Guide"
 const DRIP_COFFEE = "Drip Coffee"
 const ORDINARY_CUSTOMER = "Regular Guest"
 const HOBBYIST_GUEST = "Hobbyist"
@@ -49,8 +47,6 @@ var current_item
 
 var kayak_texture = load("res://icons/canoe.svg")
 var coffee_texture = load("res://icons/drip_coffee.svg")
-var guide_texture = load("res://icons/dirtbag.svg")
-var paddle_texture = load("res://icons/paddle.svg")
 var ordinary_texture = load("res://icons/ordinary.svg")
 var burrito_texture = load("res://icons/burrito.svg")
 var dave_texture = load("res://icons/cooking_dude.svg")
@@ -113,8 +109,6 @@ var item_money = {
 
 var item_textures = {
 	CHEAPO_KAYAK: kayak_texture,
-	WOODEN_PADDLE: paddle_texture,
-	DIRTBAG_GUIDE: guide_texture,
 	DRIP_COFFEE: coffee_texture,
 	ORDINARY_CUSTOMER: ordinary_texture,
 	BREAKY_BURRITO: burrito_texture,
@@ -142,7 +136,7 @@ var item_costs = {
 	BREAKY_BURRITO: 3,
 	FRENCH_PRESS: 5,
 	ESPRESSO: 8,
-	HOBBYIST_GUEST: 4,
+	HOBBYIST_GUEST: 7,
 	SPEEDY_KAYAK: 200,
 	RAMEN: 10,
 	BARISTA: 110,
@@ -156,32 +150,44 @@ var item_costs = {
 var item_descriptions = {
 	CHEAPO_KAYAK: "Cost: $30\n...OK it's actually a canoe, but you don't look like you've got money for anything fancy. Trips taken with this old thing take 15 seconds. One customer per canoe.",
 	DRIP_COFFEE: "Cost: $1\nNot sure how long it's been sitting in the pot... Look your guests need coffee, it'll boost your tips by $2 per passenger.",
-	ORDINARY_CUSTOMER: "Cost: Free\nHeh, this'll be my first time sea kayaking. I'll pay $4 per trip... I'm new to this though so don't expect me to come back or anything.",
+	ORDINARY_CUSTOMER: "Cost: Free\nHeh, this'll be my first time sea kayaking. I'll pay $4 per trip... I'm new to this though, so don't expect me to come back or anything.",
 	COOKING_DUDE: "Cost: $50\nHey, I'm Dave. I can cook breakfast burritos. Pay me $1 per 10 seconds and I'll make burritos for you.",
 	COFFEE_GIRL: "Cost: $90\nYo, it's Sarah. I make a mean French Press. Pay me $2 per 8 seconds and I'll be your brew person.",
 	BREAKY_BURRITO: "Cost: $3\nConsidering your financial situation... they're not just for breakfast, I guess. Guests will tip $5 extra if they get to enjoy one of these bad boys.",
 	FRENCH_PRESS: "Cost: $5\nNow that's some good Joe. It's a bit... gritty... to match the feel of the rugged outdoors. It'll increase your tips by $9 per customer.",
-	ESPRESSO: "Cost: $8\nWhat the... this tastes as good as the city's best coffee shop: The Floating Bean. Isn't it a bit... weird to serve coffee this good on a KAYAKING trip? It'll net a $14 bonus from each customer.",
+	ESPRESSO: "Cost: $8\nWhat the... this tastes just as good as the city's best coffee shop: The Floating Bean. Isn't it a bit... weird to serve coffee this good on a KAYAKING trip? It'll net a $14 bonus from each customer.",
 	BARISTA: "Cost: $110\nHey dude, I quite my job at The Floating Bean cause I hear this is the new hot spot in town. For $3 every 9 seconds I'll tamp and crank my heart out to give your guests the best espresso.",
-	HOBBYIST_GUEST: "Cost: $3\nYeah, I freaking love kayaking. It's literally the only thing I talk about. Follow me @ZaksInAYak1. I'll tip $10 and honestly I'll probably come back if I like this place.",
+	HOBBYIST_GUEST: "Cost: $7\nYeah, I freaking love kayaking. It's literally the only thing I talk about. Follow me @ZaksInAYak1. I'll tip $10, and honestly I'll probably come back if I like this place.",
 	SPEEDY_KAYAK: "Cost: $200\nOh wow, you can afford actual kayaks for your kayak outlet, congratulations. I guess it's not false advertisement anymore. These cut through the water so well that trips take only 6 seconds with them.",
 	RAMEN: "Cost: $10\nThis ain't that packet stuff. Tonkatsu broth, bamboo shoots, Shoyu pork. Your guests will be going crazy for a bowl, and I'm sure the extra $20 tip won't hurt. ",
 	CHEF: "Cost: $150\nNow normally I would only work for the finest restaurants, but I must admit I'm impressed by your little kayak outlet. For $5 every 14 seconds I'll serve your guests fresh ramen.",
-	ENTHUSIAST: "Cost: $120\nI've paddled around the globe 3 times. Also, in case you haven't noticed I'm a literal captain. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
-	ADVERT: "Cost: $300\nOh wow, you're advertising now? This is serious, I hope you're ready for all this fame. Every 20 seconds you'll get a new random customer.",
+	ENTHUSIAST: "Cost: $120\nI've paddled around the globe 3 times. Also, in case you haven't noticed I'm a literal ship captain. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
+	ADVERT: "Cost: $300\nOh wow, you're advertising now? This is serious, I hope you're ready for all the fame. Every 20 seconds you'll get a new random customer.",
 	ORCA: "Cost: $1,000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
-	SANTA: "Cost: $10,000\nHo Ho Ho! Merry Christmas, and congratulations on such a flouring kayak business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
+	SANTA: "Cost: $10,000\nHo Ho Ho! Merry Christmas, and congratulations on rebuilding this business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
 }
 
 var rng = RandomNumberGenerator.new()
 
 func _ready():
+	var save_file = File.new()
+
+	if save_file.file_exists("user://save.json"):
+		save_file.open("user://save.json", File.READ)
+		var save_data = parse_json(save_file.get_as_text())
+		save_file.close()
+		var saved_items = save_data["items"]
+		for i in saved_items:
+			_on_Bank_item_bought(i, saved_items[i])
+		for i in starting_items:
+			emit_signal("item_available", i)
+		items = saved_items
+	else:
+		for i in starting_items:
+			emit_signal("item_available", i)
 	
-	for i in starting_items:
-		emit_signal("item_available", i)
-	
-	_on_Bank_item_bought(CHEAPO_KAYAK)
-	rng.randomize()
+		_on_Bank_item_bought(CHEAPO_KAYAK)
+		rng.randomize()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -298,7 +304,7 @@ func _on_Bank_item_bought(item, amount=1):
 		emit_signal("item_bought", item, items[item])
 	else:
 		items[item] = amount
-		emit_signal("new_item_bought", item, item_textures[item])
+		emit_signal("new_item_bought", item, item_textures[item], amount)
 		
 		if item in item_times:
 			var timer = item_timer.instance()
@@ -317,6 +323,6 @@ func _on_BuyButton_pressed():
 		emit_signal("attempted_purchase", current_item, item_costs[current_item])
 
 
-func _on_Bank_items_unlocked(new_items):
+func _on_Bank_items_unlocked(new_items, _notify):
 	for i in new_items:
 		emit_signal("item_available", i)
