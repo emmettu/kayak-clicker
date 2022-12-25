@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/trigger.mp3-f43033b1c11e62cc0f7ee2bf61c9ccbc.mp3str"
+
+[deps]
+
+source_file="res://sounds/trigger.mp3"
+dest_files=[ "res://.import/trigger.mp3-f43033b1c11e62cc0f7ee2bf61c9ccbc.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

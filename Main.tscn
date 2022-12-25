@@ -1,0 +1,206 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://ItemList.gd" type="Script" id=1]
+[ext_resource path="res://Bank.gd" type="Script" id=2]
+[ext_resource path="res://Shop.gd" type="Script" id=3]
+[ext_resource path="res://BoughtItems.gd" type="Script" id=4]
+[ext_resource path="res://MoneyLabel.gd" type="Script" id=5]
+[ext_resource path="res://fonts/medium.tres" type="DynamicFont" id=6]
+[ext_resource path="res://fonts/small.tres" type="DynamicFont" id=7]
+[ext_resource path="res://Popup.tscn" type="PackedScene" id=8]
+[ext_resource path="res://InfoPanel.gd" type="Script" id=9]
+[ext_resource path="res://Particle.tscn" type="PackedScene" id=10]
+[ext_resource path="res://icons/cash.svg" type="Texture" id=11]
+[ext_resource path="res://fonts/tiny.tres" type="DynamicFont" id=12]
+[ext_resource path="res://DescriptionLabel.gd" type="Script" id=13]
+[ext_resource path="res://ShopIcon.gd" type="Script" id=14]
+[ext_resource path="res://icons/owner.svg" type="Texture" id=15]
+[ext_resource path="res://Title.gd" type="Script" id=16]
+[ext_resource path="res://sounds/buy.mp3" type="AudioStream" id=17]
+[ext_resource path="res://BuySound.gd" type="Script" id=18]
+[ext_resource path="res://TriggerSound.gd" type="Script" id=19]
+[ext_resource path="res://sounds/trigger.mp3" type="AudioStream" id=20]
+[ext_resource path="res://sounds/soundtrack.mp3" type="AudioStream" id=21]
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="ItemList" type="ItemList" parent="."]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -180.0
+margin_bottom = -52.0
+rect_rotation = 0.0289667
+custom_fonts/font = ExtResource( 7 )
+script = ExtResource( 1 )
+
+[node name="BoughtItems" type="GridContainer" parent="."]
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 945.0
+margin_bottom = -89.0
+columns = 6
+script = ExtResource( 4 )
+
+[node name="Shop" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource( 3 )
+
+[node name="Bank" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="InfoPanel" type="Control" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 10.0
+margin_top = -90.0
+margin_right = 961.0
+margin_bottom = -10.0
+script = ExtResource( 9 )
+
+[node name="MoneyLabel" type="Label" parent="InfoPanel"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 7.0
+margin_top = -35.0
+margin_right = 120.0
+custom_fonts/font = ExtResource( 6 )
+text = "Money: "
+script = ExtResource( 5 )
+
+[node name="Particles" parent="InfoPanel/MoneyLabel" instance=ExtResource( 10 )]
+position = Vector2( 94, -22 )
+pool_size = 10
+texture = ExtResource( 11 )
+
+[node name="DescriptionPanel" type="Control" parent="InfoPanel"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -570.0
+margin_top = -87.0
+margin_bottom = -12.0
+
+[node name="DescriptionLabel" type="Label" parent="InfoPanel/DescriptionPanel"]
+margin_top = -10.0
+margin_right = 477.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 300, 19 )
+custom_fonts/font = ExtResource( 12 )
+autowrap = true
+script = ExtResource( 13 )
+
+[node name="ShopIcon" type="TextureRect" parent="InfoPanel/DescriptionPanel"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -72.0
+margin_bottom = 72.0
+rect_min_size = Vector2( 72, 72 )
+script = ExtResource( 14 )
+
+[node name="NoMoneyPopup" parent="." instance=ExtResource( 8 )]
+text = "Not enough money"
+
+[node name="BuyButton" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -173.0
+margin_top = -46.0
+margin_right = -8.0
+margin_bottom = -8.0
+custom_fonts/font = ExtResource( 6 )
+text = "Purchase"
+
+[node name="UnlockPopup" parent="." instance=ExtResource( 8 )]
+text = "New items unlocked!"
+font_color = Color( 1, 1, 1, 1 )
+
+[node name="Title" type="CanvasLayer" parent="."]
+script = ExtResource( 16 )
+
+[node name="Panel2" type="Panel" parent="Title"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Label" type="Label" parent="Title/Panel2"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -373.0
+margin_top = -206.0
+margin_right = 373.0
+margin_bottom = 71.0
+custom_fonts/font = ExtResource( 7 )
+text = "Sorry we're closed. WE'RE CLOS-
+
+Wait a minute, you're the new owner aren't you? Geez, why'd a kiddo like you go and buy a place like this? We've got about $10 in the bank and I think pretty much all the kayaks are broken except one. 
+
+Ugh, I'm being pessimistic. Who knows, maybe you can turn this place around.
+
+The first thing you gotta know about running a kayak outlet is the TWO Ks. KAYAKS, and KUSTOMERS. Remember that, and you're all set. Anyway... good luck I guess."
+autowrap = true
+
+[node name="Button" type="Button" parent="Title/Panel2"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -164.0
+margin_top = -234.0
+margin_right = 156.0
+margin_bottom = -199.0
+custom_fonts/font = ExtResource( 6 )
+text = "Click Here to Continue"
+
+[node name="TextureRect" type="TextureRect" parent="Title"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 132.0
+margin_top = -217.0
+margin_right = 388.0
+margin_bottom = 39.0
+texture = ExtResource( 15 )
+
+[node name="BuySound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 17 )
+script = ExtResource( 18 )
+
+[node name="TriggerSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 20 )
+script = ExtResource( 19 )
+
+[node name="SoundTrack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 21 )
+autoplay = true
+
+[connection signal="item_selected" from="ItemList" to="Shop" method="_on_ItemList_item_selected"]
+[connection signal="attempted_purchase" from="Shop" to="Bank" method="_on_Shop_attempted_purchase"]
+[connection signal="item_available" from="Shop" to="ItemList" method="_on_Shop_item_available"]
+[connection signal="item_bought" from="Shop" to="BoughtItems" method="_on_Shop_item_bought"]
+[connection signal="item_selected" from="Shop" to="InfoPanel/DescriptionPanel/DescriptionLabel" method="_on_Shop_item_selected"]
+[connection signal="item_selected" from="Shop" to="InfoPanel/DescriptionPanel/ShopIcon" method="_on_Shop_item_selected"]
+[connection signal="item_triggered" from="Shop" to="TriggerSound" method="_on_Shop_item_triggered"]
+[connection signal="money_earned" from="Shop" to="Bank" method="_on_Shop_money_earned"]
+[connection signal="new_item_bought" from="Shop" to="BoughtItems" method="_on_Shop_new_item_bought"]
+[connection signal="item_bought" from="Bank" to="Shop" method="_on_Bank_item_bought"]
+[connection signal="item_bought" from="Bank" to="BuySound" method="_on_Bank_item_bought"]
+[connection signal="items_unlocked" from="Bank" to="Shop" method="_on_Bank_items_unlocked"]
+[connection signal="items_unlocked" from="Bank" to="UnlockPopup" method="_on_Bank_items_unlocked"]
+[connection signal="money_updated" from="Bank" to="InfoPanel/MoneyLabel" method="_on_Bank_money_updated"]
+[connection signal="not_enough_money" from="Bank" to="NoMoneyPopup" method="_on_Bank_not_enough_money"]
+[connection signal="pressed" from="BuyButton" to="Shop" method="_on_BuyButton_pressed"]
+[connection signal="pressed" from="Title/Panel2/Button" to="Title" method="_on_Button_pressed"]
