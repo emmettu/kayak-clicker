@@ -24,6 +24,7 @@ var item_timer = preload("res://Item.tscn")
 onready var item_list = get_node("%ItemList")
 
 const CHEAPO_KAYAK = "Cheapo Kayak"
+const DIRTBAG_GUIDE = "Dritbag Guide"
 const DRIP_COFFEE = "Drip Coffee"
 const ORDINARY_CUSTOMER = "Regular Guest"
 const HOBBYIST_GUEST = "Hobbyist"
@@ -48,6 +49,7 @@ var current_item
 var kayak_texture = load("res://icons/canoe.svg")
 var coffee_texture = load("res://icons/drip_coffee.svg")
 var ordinary_texture = load("res://icons/ordinary.svg")
+var dirtbag_texture = load("res://icons/dirtbag.svg")
 var burrito_texture = load("res://icons/burrito.svg")
 var dave_texture = load("res://icons/cooking_dude.svg")
 var french_press_texture = load("res://icons/french_press.svg")
@@ -63,12 +65,19 @@ var news_advert_texture = load("res://icons/news_advert.svg")
 var orca_texture = load("res://icons/orca.svg")
 var santa_texture = load("res://icons/santa.svg")
 
-var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER]
+var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER, DIRTBAG_GUIDE]
 # var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER, DRIP_COFFEE, SPEEDY_KAYAK, COFFEE_GIRL, CHEF, RAMEN, ENTHUSIAST, ADVERT, ORCA, BARISTA, ESPRESSO]
 
 const CUSTOMER_PRIORITY = [SANTA, ENTHUSIAST, HOBBYIST_GUEST, ORDINARY_CUSTOMER]
 
-const TREAT_PRIORITY = [RAMEN, ESPRESSO, FRENCH_PRESS, BREAKY_BURRITO, DRIP_COFFEE]
+const FOOD_PRIORITY = [RAMEN, BREAKY_BURRITO]
+const COFFEE_PRIORITY = [ESPRESSO, FRENCH_PRESS, DRIP_COFFEE]
+
+const GUIDE_PRIORITY = [DIRTBAG_GUIDE]
+
+var guide_capacity = {
+	DIRTBAG_GUIDE: 10,
+}
 
 var periodic_costs = {
 	COOKING_DUDE: 1,
@@ -111,6 +120,7 @@ var item_textures = {
 	CHEAPO_KAYAK: kayak_texture,
 	DRIP_COFFEE: coffee_texture,
 	ORDINARY_CUSTOMER: ordinary_texture,
+	DIRTBAG_GUIDE: dirtbag_texture,
 	BREAKY_BURRITO: burrito_texture,
 	COOKING_DUDE: dave_texture,
 	FRENCH_PRESS: french_press_texture,
@@ -131,6 +141,7 @@ var item_costs = {
 	CHEAPO_KAYAK: 30,
 	DRIP_COFFEE: 1,
 	ORDINARY_CUSTOMER: 0,
+	DIRTBAG_GUIDE: 50,
 	COOKING_DUDE: 50,
 	COFFEE_GIRL: 90,
 	BREAKY_BURRITO: 3,
@@ -151,6 +162,7 @@ var item_descriptions = {
 	CHEAPO_KAYAK: "Cost: $30\n...OK it's actually a canoe, but you don't look like you've got money for anything fancy. Trips taken with this old thing take 15 seconds. One customer per canoe.",
 	DRIP_COFFEE: "Cost: $1\nNot sure how long it's been sitting in the pot... Look your guests need coffee, it'll boost your tips by $2 per passenger.",
 	ORDINARY_CUSTOMER: "Cost: Free\nHeh, this'll be my first time sea kayaking. I'll pay $4 per trip... I'm new to this though, so don't expect me to come back or anything.",
+	DIRTBAG_GUIDE: "Cost: $50\nACSKG? Is that a science thing or something? Look just pay me $1 per 10 seconds and I'll run kayak trips for you.",
 	COOKING_DUDE: "Cost: $50\nHey, I'm Dave. I can cook breakfast burritos. Pay me $1 per 10 seconds and I'll make burritos for you.",
 	COFFEE_GIRL: "Cost: $90\nYo, it's Sarah. I make a mean French Press. Pay me $2 per 8 seconds and I'll be your brew person.",
 	BREAKY_BURRITO: "Cost: $3\nConsidering your financial situation... they're not just for breakfast, I guess. Guests will tip $5 extra if they get to enjoy one of these bad boys.",
@@ -187,6 +199,7 @@ func _ready():
 			emit_signal("item_available", i)
 	
 		_on_Bank_item_bought(CHEAPO_KAYAK)
+		_on_Bank_item_bought(DIRTBAG_GUIDE)
 		rng.randomize()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -221,47 +234,100 @@ func _on_Item_triggered(name):
 	
 	if name.ends_with("Kayak"):
 		var customers_served = {}
+		var guide_capacity_remaining = {}
 		var kayak_count = items[name]
-		var treats_needed = 0
-		for customer_type in CUSTOMER_PRIORITY:
-			customers_served[customer_type] = 0
-			if not customer_type in items or items[customer_type] < 1:
-				continue
-			var customer_type_count = items[customer_type]
-			if customer_type_count < kayak_count:
-				customers_served[customer_type] += customer_type_count
-				treats_needed += customer_type_count
-				kayak_count -= customer_type_count
-			else:
-				customers_served[customer_type] = kayak_count
-				treats_needed += kayak_count
-				kayak_count = 0
-		
+		var customers_left = {}
+		var total_served = 0
 		var trip_money = 0
-		for treat_type in TREAT_PRIORITY:
-			if treat_type in items and items[treat_type] > 0 and treats_needed > 0:
-				var treats_used = min(items[treat_type], treats_needed)
-				treats_needed -= treats_used
-				items[treat_type] -= treats_used
-				trip_money += treats_used * item_money[treat_type]
-				emit_signal("item_bought", treat_type, items[treat_type])
-				emit_signal("item_triggered", treat_type, treats_used)
+		
+		for guide_type in GUIDE_PRIORITY:
+			guide_capacity_remaining[guide_type] = items.get(guide_type, 0) * guide_capacity[guide_type]
 			
-		for customer_type in customers_served:
-			if customers_served[customer_type] < 1:
+		for customer_type in CUSTOMER_PRIORITY:
+			customers_left[customer_type] = items.get(customer_type, 0)
+			
+		var guide_index = 0; var customer_index = 0
+		while guide_index < len(GUIDE_PRIORITY) and customer_index < len(CUSTOMER_PRIORITY) and kayak_count > 0:
+			var guide_type = GUIDE_PRIORITY[guide_index]
+			var customer_type = CUSTOMER_PRIORITY[customer_index]
+			
+			var used = [guide_capacity_remaining[guide_type], customers_left[customer_type], kayak_count].min()
+			
+			guide_capacity_remaining[guide_type] -= used
+			kayak_count -= used
+			customers_left[customer_type] -= used
+			total_served += used
+			
+			if customers_left[customer_type] <= 0:
+				customer_index += 1
+			if guide_capacity_remaining[guide_type] <= 0:
+				guide_index += 1
+			
+#		for customer_type in CUSTOMER_PRIORITY:
+#			customers_served[customer_type] = 0
+#			if not customer_type in items or items[customer_type] < 1:
+#				continue
+#			var customer_type_count = items[customer_type]
+#			if customer_type_count < kayak_count:
+#				customers_served[customer_type] += customer_type_count
+#				treats_needed += customer_type_count
+#				kayak_count -= customer_type_count
+#			else:
+#				customers_served[customer_type] = kayak_count
+#				treats_needed += kayak_count
+#				kayak_count = 0
+		
+		var coffee_needed = total_served
+		var food_needed = total_served
+		for coffee_type in COFFEE_PRIORITY:
+			if coffee_type in items and items[coffee_type] > 0 and coffee_needed > 0:
+				var coffee_used = min(items[coffee_type], coffee_needed)
+				coffee_needed -= coffee_used
+				items[coffee_type] -= coffee_used
+				trip_money += coffee_used * item_money[coffee_type]
+				emit_signal("item_bought", coffee_type, items[coffee_type])
+				emit_signal("item_triggered", coffee_type, coffee_used)
+				
+		for food_type in FOOD_PRIORITY:
+			if food_type in items and items[food_type] > 0 and food_needed > 0:
+				var food_used = min(items[food_type], food_needed)
+				food_needed -= food_used
+				items[food_type] -= food_used
+				trip_money += food_used * item_money[food_type]
+				emit_signal("item_bought", food_type, items[food_type])
+				emit_signal("item_triggered", food_type, food_used)
+			
+		for customer_type in customers_left:
+			var served = items.get(customer_type, 0) - customers_left[customer_type]
+			if served < 1:
 				continue
 				
-			var customers_retained = floor(customer_retention[customer_type] * customers_served[customer_type])
+			var customers_retained = floor(customer_retention[customer_type] * served)
 			print("RETAINED: ", customers_retained)
-			items[customer_type] -= customers_served[customer_type]
+			items[customer_type] -= served
 			items[customer_type] += customers_retained
-			trip_money += item_money[customer_type] * customers_served[customer_type]
+			trip_money += item_money[customer_type] * served
 			
-			emit_signal("item_triggered", customer_type, customers_served[customer_type])
-			emit_signal("item_triggered", name, customers_served[customer_type])
+			emit_signal("item_triggered", customer_type, served)
 			emit_signal("item_bought", customer_type, items[customer_type])
 		
-		if ORCA in items:
+		
+		if total_served > 0:
+			emit_signal("item_triggered", name, items[name] - kayak_count)
+		
+		
+		for guide_type in guide_capacity_remaining:
+			var capacity = guide_capacity[guide_type] * items.get(guide_type, 0)
+			var capacity_used = capacity - guide_capacity_remaining[guide_type]
+			var guides_used = ceil(capacity_used / guide_capacity[guide_type])
+			if guides_used < 1:
+				continue
+				
+			print(guide_type, " CAPACITY OF ", capacity, " we used ", capacity_used, " therefore ", guides_used, " guides were used")
+			
+			emit_signal("item_triggered", guide_type, guides_used)
+			
+		if ORCA in items and total_served > 0:
 			var orca_count = items[ORCA]
 			var chance = 0.1 * orca_count
 			if rng.randf() < chance:

@@ -5,7 +5,6 @@
 
 [sub_resource type="StreamTexture" id=2]
 flags = 4
-load_path = "res://.import/dirtbag.svg-33007edc31daf1d76dc126030a197ebf.stex"
 
 [sub_resource type="Gradient" id=1]
 offsets = PoolRealArray( 0, 0.75419, 1 )
