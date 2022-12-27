@@ -15,6 +15,7 @@ const COOKING_DUDE = "Cooking Dude"
 const BREAKY_BURRITO = "Breaky Burrito"
 const FRENCH_PRESS = "French Press"
 const SPEEDY_KAYAK = "Speedy Kayak"
+const CAPTAIN = "Captain"
 const COFFEE_GIRL = "Coffee Girl"
 const ESPRESSO = "Espresso"
 const BARISTA = "Barista"
@@ -36,12 +37,13 @@ var unlock_tiers = {
 	600: [COFFEE_GIRL],
 	800: [RAMEN],
 	1000: [BARISTA],
-	1200: [SPEEDY_KAYAK],
-	1500: [CHEF],
-	3000: [ENTHUSIAST],
-	8000: [ADVERT],
-	12000: [ORCA],
-	25000: [SANTA],
+	3000: [CAPTAIN],
+	4000: [SPEEDY_KAYAK],
+	8000: [CHEF],
+	15000: [ENTHUSIAST],
+	25000: [ADVERT],
+	50000: [ORCA],
+	100000: [SANTA],
 }
 
 signal money_updated(money, amount)

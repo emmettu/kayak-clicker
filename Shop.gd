@@ -24,13 +24,14 @@ var item_timer = preload("res://Item.tscn")
 onready var item_list = get_node("%ItemList")
 
 const CHEAPO_KAYAK = "Cheapo Kayak"
-const DIRTBAG_GUIDE = "Dritbag Guide"
+const DIRTBAG_GUIDE = "Dirtbag Guide"
 const DRIP_COFFEE = "Drip Coffee"
 const ORDINARY_CUSTOMER = "Regular Guest"
 const HOBBYIST_GUEST = "Hobbyist"
 const COOKING_DUDE = "Cooking Dude"
 const BREAKY_BURRITO = "Breaky Burrito"
 const FRENCH_PRESS = "French Press"
+const CAPTAIN = "Captain"
 const COFFEE_GIRL = "Coffee Girl"
 const ESPRESSO = "Espresso"
 const BARISTA = "Barista"
@@ -58,6 +59,7 @@ var barista_texture = load("res://icons/barista.svg")
 var hobbyist_texture = load("res://icons/hobbyist.svg")
 var speed_kayak_texture = load("res://icons/kayak.svg")
 var coffee_girl_texture = load("res://icons/coffee_girl.svg")
+var captain_texture = load("res://icons/experienced_guide.svg")
 var chef_texture = load("res://icons/chef.svg")
 var ramen_texture = load("res://icons/ramen.svg")
 var enthusiast_texture = load("res://icons/enthusiast.svg")
@@ -73,10 +75,11 @@ const CUSTOMER_PRIORITY = [SANTA, ENTHUSIAST, HOBBYIST_GUEST, ORDINARY_CUSTOMER]
 const FOOD_PRIORITY = [RAMEN, BREAKY_BURRITO]
 const COFFEE_PRIORITY = [ESPRESSO, FRENCH_PRESS, DRIP_COFFEE]
 
-const GUIDE_PRIORITY = [DIRTBAG_GUIDE]
+const GUIDE_PRIORITY = [CAPTAIN, DIRTBAG_GUIDE]
 
 var guide_capacity = {
 	DIRTBAG_GUIDE: 10,
+	CAPTAIN: 30,
 }
 
 var periodic_costs = {
@@ -126,6 +129,7 @@ var item_textures = {
 	FRENCH_PRESS: french_press_texture,
 	HOBBYIST_GUEST: hobbyist_texture,
 	SPEEDY_KAYAK: speed_kayak_texture,
+	CAPTAIN: captain_texture,
 	COFFEE_GIRL: coffee_girl_texture,
 	BARISTA: barista_texture,
 	ESPRESSO: espresso_texture,
@@ -141,7 +145,7 @@ var item_costs = {
 	CHEAPO_KAYAK: 30,
 	DRIP_COFFEE: 1,
 	ORDINARY_CUSTOMER: 0,
-	DIRTBAG_GUIDE: 50,
+	DIRTBAG_GUIDE: 80,
 	COOKING_DUDE: 50,
 	COFFEE_GIRL: 90,
 	BREAKY_BURRITO: 3,
@@ -149,6 +153,7 @@ var item_costs = {
 	ESPRESSO: 8,
 	HOBBYIST_GUEST: 7,
 	SPEEDY_KAYAK: 200,
+	CAPTAIN: 180,
 	RAMEN: 10,
 	BARISTA: 110,
 	CHEF: 150,
@@ -173,7 +178,8 @@ var item_descriptions = {
 	SPEEDY_KAYAK: "Cost: $200\nOh wow, you can afford actual kayaks for your kayak outlet, congratulations. I guess it's not false advertisement anymore. These cut through the water so well that trips take only 6 seconds with them.",
 	RAMEN: "Cost: $10\nThis ain't that packet stuff. Tonkatsu broth, bamboo shoots, Shoyu pork. Your guests will be going crazy for a bowl, and I'm sure the extra $20 tip won't hurt. ",
 	CHEF: "Cost: $150\nNow normally I would only work for the finest restaurants, but I must admit I'm impressed by your little kayak outlet. For $5 every 14 seconds I'll serve your guests fresh ramen.",
-	ENTHUSIAST: "Cost: $120\nI've paddled around the globe 3 times. Also, in case you haven't noticed I'm a literal ship captain. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
+	ENTHUSIAST: "Cost: $120\nOh this getup? Well, I've paddled around the globe 3 times, so I know you can never let the weather surprise you. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
+	CAPTAIN: "Cost: $180\nNormally I'm captaining cruise ships, but it sounds like I'd get paid more here. I can handle 30 guests easily.",
 	ADVERT: "Cost: $300\nOh wow, you're advertising now? This is serious, I hope you're ready for all the fame. Every 20 seconds you'll get a new random customer.",
 	ORCA: "Cost: $1,000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
 	SANTA: "Cost: $10,000\nHo Ho Ho! Merry Christmas, and congratulations on rebuilding this business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
