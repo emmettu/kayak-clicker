@@ -63,11 +63,12 @@ script = ExtResource( 2 )
 
 [node name="InfoPanel" type="Control" parent="."]
 anchor_top = 1.0
+anchor_right = 0.841
 anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = -90.0
-margin_right = 961.0
-margin_bottom = -10.0
+margin_left = 9.0
+margin_top = -107.0
+margin_right = 3.16797
+margin_bottom = -13.0
 script = ExtResource( 9 )
 
 [node name="MoneyLabel" type="Label" parent="InfoPanel"]
@@ -131,6 +132,7 @@ text = "New items unlocked!"
 font_color = Color( 1, 1, 1, 1 )
 
 [node name="Title" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource( 16 )
 
 [node name="Panel2" type="Panel" parent="Title"]
@@ -195,6 +197,7 @@ autostart = true
 script = ExtResource( 22 )
 
 [connection signal="item_selected" from="ItemList" to="Shop" method="_on_ItemList_item_selected"]
+[connection signal="resized" from="BoughtItems" to="BoughtItems" method="_on_BoughtItems_resized"]
 [connection signal="attempted_purchase" from="Shop" to="Bank" method="_on_Shop_attempted_purchase"]
 [connection signal="item_available" from="Shop" to="ItemList" method="_on_Shop_item_available"]
 [connection signal="item_bought" from="Shop" to="BoughtItems" method="_on_Shop_item_bought"]

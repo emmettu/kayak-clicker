@@ -5,11 +5,11 @@ extends Timer
 # var a = 2
 # var b = "text"
 
+var thread
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
-
+	thread = Thread.new()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -17,6 +17,12 @@ func _ready():
 
 
 func _on_Autosaver_timeout():
+	
+	if thread.is_active():
+		thread.wait_to_finish()
+	thread.start(self, "save")
+	
+func save():
 	print("SAVING DATA")
 	var shop = get_node("%Shop")
 	var bank = get_node("%Bank")
@@ -36,3 +42,6 @@ func _on_Autosaver_timeout():
 	
 	save_file.store_string(to_json(save_data))
 	save_file.close()
+
+func _exit_tree():
+	thread.wait_to_finish()

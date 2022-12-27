@@ -32,3 +32,7 @@ func _on_Shop_new_item_bought(item, texture, count=1):
 func _on_Shop_item_bought(item, count):
 	var node = get_node(item)
 	node.set_count(count)
+
+
+func _on_BoughtItems_resized():
+	columns = floor((get_viewport_rect().size.x - 240) / 150)
