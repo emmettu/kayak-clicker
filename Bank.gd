@@ -24,6 +24,7 @@ const RAMEN = "Fresh Ramen"
 const ENTHUSIAST = "Yak Enthusiast"
 const ADVERT = "News Advert"
 const ORCA = "Orca"
+const KAYAK_FACTORY = "Kayak Factory"
 const SANTA = "Santa"
 
 var max_unlock = 0
@@ -43,7 +44,8 @@ var unlock_tiers = {
 	15000: [ENTHUSIAST],
 	25000: [ADVERT],
 	50000: [ORCA],
-	100000: [SANTA],
+	100000: [KAYAK_FACTORY],
+	200000: [SANTA],
 }
 
 signal money_updated(money, amount)

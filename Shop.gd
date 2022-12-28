@@ -41,6 +41,7 @@ const RAMEN = "Fresh Ramen"
 const ENTHUSIAST = "Yak Enthusiast"
 const ADVERT = "News Advert"
 const ORCA = "Orca"
+const KAYAK_FACTORY = "Kayak Factory"
 const SANTA = "Santa"
 
 var items = {}
@@ -65,6 +66,7 @@ var ramen_texture = load("res://icons/ramen.svg")
 var enthusiast_texture = load("res://icons/enthusiast.svg")
 var news_advert_texture = load("res://icons/news_advert.svg")
 var orca_texture = load("res://icons/orca.svg")
+var factory_texture = load("res://icons/factory.svg")
 var santa_texture = load("res://icons/santa.svg")
 
 var starting_items = [CHEAPO_KAYAK, ORDINARY_CUSTOMER, DIRTBAG_GUIDE]
@@ -76,6 +78,8 @@ const FOOD_PRIORITY = [RAMEN, BREAKY_BURRITO]
 const COFFEE_PRIORITY = [ESPRESSO, FRENCH_PRESS, DRIP_COFFEE]
 
 const GUIDE_PRIORITY = [CAPTAIN, DIRTBAG_GUIDE]
+
+const KAYAK_TYPES = [SPEEDY_KAYAK, CHEAPO_KAYAK]
 
 var guide_capacity = {
 	DIRTBAG_GUIDE: 10,
@@ -97,6 +101,7 @@ var item_times = {
 	BARISTA: 9,
 	CHEF: 14,
 	ADVERT: 20,
+	KAYAK_FACTORY: 25,
 }
 
 var customer_retention = {
@@ -138,6 +143,7 @@ var item_textures = {
 	ENTHUSIAST: enthusiast_texture,
 	ADVERT: news_advert_texture,
 	ORCA: orca_texture,
+	KAYAK_FACTORY: factory_texture,
 	SANTA: santa_texture,
 }
 
@@ -158,9 +164,10 @@ var item_costs = {
 	BARISTA: 110,
 	CHEF: 150,
 	ENTHUSIAST: 120,
-	ADVERT: 300,
-	ORCA: 1000,
-	SANTA: 10000,
+	ADVERT: 1000,
+	ORCA: 10000,
+	KAYAK_FACTORY: 20000,
+	SANTA: 50000,
 }
 
 var item_descriptions = {
@@ -180,9 +187,10 @@ var item_descriptions = {
 	CHEF: "Cost: $150\nNow normally I would only work for the finest restaurants, but I must admit I'm impressed by your little kayak outlet. For $5 every 14 seconds I'll serve your guests fresh ramen.",
 	ENTHUSIAST: "Cost: $120\nOh this getup? Well, I've paddled around the globe 3 times, so I know you can never let the weather surprise you. If I like a kayak place I'll come back everytime, which means I'll pay $15 everytime.",
 	CAPTAIN: "Cost: $180\nNormally I'm captaining cruise ships, but it sounds like I'd get paid more here. I can handle 30 guests easily.",
-	ADVERT: "Cost: $300\nOh wow, you're advertising now? This is serious, I hope you're ready for all the fame. Every 20 seconds you'll get a new random customer.",
-	ORCA: "Cost: $1,000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
-	SANTA: "Cost: $10,000\nHo Ho Ho! Merry Christmas, and congratulations on rebuilding this business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
+	ADVERT: "Cost: $1000\nOh wow, you're advertising now? This is serious, I hope you're ready for all the fame. Every 20 seconds you'll get a new random customer.",
+	ORCA: "Cost: $10,000\nWait wait wait, you're buying literal WHALES now? Is that- is that humane? I have no idea. Each orca has a 10% chance to be spotted per trip. Triples tip money.",
+	KAYAK_FACTORY: "Cost: $20,000\nDoesn't this seem a bit... at odds with the green and outdoorsy vibe a kayak outlet would traditionally have? Well, you gotta supply the demand somehow I guess.",
+	SANTA: "Cost: $50,000\nHo Ho Ho! Merry Christmas, and congratulations on rebuilding this business! Santa loves capitalism! I'd love to go for a trip myself you know, and if you've been good there's $500 in it for you.",
 }
 
 var rng = RandomNumberGenerator.new()
@@ -238,7 +246,7 @@ func _on_ItemList_item_selected(index):
 func _on_Item_triggered(name):
 	# var amount = item_money[name] * items[name]
 	
-	if name.ends_with("Kayak"):
+	if name in KAYAK_TYPES:
 		var customers_served = {}
 		var guide_capacity_remaining = {}
 		var kayak_count = items[name]
@@ -268,20 +276,6 @@ func _on_Item_triggered(name):
 				customer_index += 1
 			if guide_capacity_remaining[guide_type] <= 0:
 				guide_index += 1
-			
-#		for customer_type in CUSTOMER_PRIORITY:
-#			customers_served[customer_type] = 0
-#			if not customer_type in items or items[customer_type] < 1:
-#				continue
-#			var customer_type_count = items[customer_type]
-#			if customer_type_count < kayak_count:
-#				customers_served[customer_type] += customer_type_count
-#				treats_needed += customer_type_count
-#				kayak_count -= customer_type_count
-#			else:
-#				customers_served[customer_type] = kayak_count
-#				treats_needed += kayak_count
-#				kayak_count = 0
 		
 		var coffee_needed = total_served
 		var food_needed = total_served
@@ -366,6 +360,11 @@ func _on_Item_triggered(name):
 		emit_signal("item_triggered", name, items[name])
 		var customer_type = CUSTOMER_PRIORITY[rng.randi() % len(CUSTOMER_PRIORITY)]
 		_on_Bank_item_bought(customer_type, items[name])
+		
+	elif name == KAYAK_FACTORY:
+		emit_signal("item_triggered", name, items[name])
+		var kayak_type = KAYAK_TYPES[rng.randi() % len(KAYAK_TYPES)]
+		_on_Bank_item_bought(kayak_type, items[name])
 	# emit_signal("item_triggered", name, customers_served[])
 
 
